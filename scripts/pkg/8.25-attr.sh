@@ -120,7 +120,7 @@ echo
 echo "3) 手册本节的**前置条件实测**（这是本节独有的一句，必须当成硬性前置来验）："
 echo "   手册原文：The tests must be run on a filesystem that supports extended"
 echo "     attributes such as the ext2, ext3, or ext4 filesystems."
-echo "   本节的解包与构建目录在 /sources（= 宿主 /root/lfs/sources 的 bind mount），"
+echo "   本节的解包与构建目录在 /sources（= 宿主 $LFS_ROOT/sources 的 bind mount），"
 echo "   make check 由 automake 在同一目录下跑，故要验的就是 /sources 所在文件系统。"
 echo "   当前挂载表中 / 与 /sources 的条目："
 { grep -E ' (/|/sources) ' /proc/self/mounts || true; } | sed 's/^/     /'
@@ -781,7 +781,7 @@ echo
 
 echo "----- 保留日志摘要后清理构建目录（手册 iii：删除解包出来的源码目录） -----"
 echo "（摘要先写到 /sources —— 它是宿主机 bind mount，随后由宿主机侧 run-8.25.sh"
-echo "  移入 /root/lfs/logs/packages/，不会在镜像内留下多余目录）"
+echo "  移入 $LFS_ROOT/logs/packages/，不会在镜像内留下多余目录）"
 echo "  configure    完整输出：$CONFLOG"
 echo "  make         完整输出：$MAKELOG"
 echo "  make check   完整输出：$CHECKLOG"

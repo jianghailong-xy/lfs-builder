@@ -6,7 +6,7 @@
 #   chroot.sh status          只读查看 chroot 前置状态
 #
 # 约定见 docs/conventions.md：容器内 $LFS=/mnt/lfs，源码在 $LFS/sources，
-# 日志由宿主机侧 run-*.sh 收集到 /root/lfs/logs/。
+# 日志由宿主机侧 run-*.sh 收集到 $LFS_ROOT/logs/。
 set -euo pipefail
 export LC_ALL=C LANG=C
 

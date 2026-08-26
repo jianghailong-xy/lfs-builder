@@ -1,5 +1,7 @@
 # LFS 13.0-systemd Chapter 9 and Section 10.2 checkpoint
 
+> `/root/lfs` below records the original build host; use the current clone's repository root in a new checkout.
+
 Completed on 2026-08-25 for the QEMU raw image rooted at `/root/lfs/mnt/lfs`.
 
 - Networking: systemd-networkd IPv4 DHCP for wired interfaces (`en*` and `eth*`), with DHCP domains enabled. systemd-resolved is left enabled and will create `/etc/resolv.conf` on first boot.

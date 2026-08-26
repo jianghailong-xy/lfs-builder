@@ -3,7 +3,7 @@
 # 退出码：0 = 所有强制检查通过（可选项可能仍有 WARN）；1 = 存在强制项失败。
 set -u -o pipefail
 
-LFS_ROOT="${LFS_ROOT:-/root/lfs}"
+LFS_ROOT="${LFS_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 MIN_FREE_GB="${MIN_FREE_GB:-60}"
 IMAGE_SIZE_GB="${IMAGE_SIZE_GB:-30}"
 

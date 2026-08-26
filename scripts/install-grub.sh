@@ -2,13 +2,14 @@
 # 安装 BIOS GRUB 到 images/lfs.img 对应的 loop 设备，并使用实际 PARTUUID。
 set -euo pipefail
 
-LFS_ROOT="${LFS_ROOT:-/root/lfs}"
+LFS_ROOT="${LFS_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 IMAGES_DIR="${IMAGES_DIR:-$LFS_ROOT/images}"
 IMAGE="${IMAGE:-$IMAGES_DIR/lfs.img}"
 LFS_MNT="${LFS_MNT:-$LFS_ROOT/mnt/lfs}"
-CONTAINER="${CONTAINER:-lfs-build}"
+CONTAINER="${CONTAINER:-lfs-build-$(basename "$LFS_ROOT")}"
 HOST_LOGS_DIR="${HOST_LOGS_DIR:-$LFS_ROOT/logs/host}"
-EXPECTED_UUID="${EXPECTED_UUID:-e0292aee-a40c-414b-a00b-d3d2685b6b0d}"
+IMAGE_INFO="${IMAGE_INFO:-$IMAGE.info}"
+EXPECTED_UUID="${EXPECTED_UUID:-${IMAGE_UUID:-}}"
 
 die() { printf '[FAIL] %s\n' "$*" >&2; exit 1; }
 
@@ -40,6 +41,10 @@ part="$(findmnt -n -o SOURCE "$LFS_MNT" 2>/dev/null || true)"
 case "$part" in /dev/loop[0-9]*p1) ;; *) die "$LFS_MNT 必须挂载自 loop 的第 1 分区；当前：${part:-未挂载}" ;; esac
 loop="${part%p1}"
 assert_project_loop "$loop"
+if [ -z "$EXPECTED_UUID" ] && [ -f "$IMAGE_INFO" ]; then
+    EXPECTED_UUID="$(sed -n 's/^PART1_UUID=//p' "$IMAGE_INFO" | head -1)"
+fi
+[ -n "$EXPECTED_UUID" ] || die "无法从 $IMAGE_INFO 读取预期 UUID"
 [ "$(blkid -s UUID -o value "$part")" = "$EXPECTED_UUID" ] \
     || die "$part 的 UUID 与预期 $EXPECTED_UUID 不符"
 docker inspect -f '{{.State.Running}}' "$CONTAINER" 2>/dev/null | grep -qx true \

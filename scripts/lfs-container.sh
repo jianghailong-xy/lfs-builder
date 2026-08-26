@@ -11,17 +11,17 @@
 #   lfs-container.sh down     停止并删除容器（不动镜像与产物）
 #   lfs-container.sh status   只读状态
 #
-# 挂载点约定见 docs/conventions.md：宿主 /root/lfs -> /workspace，
-# 宿主 /root/lfs/mnt/lfs -> /mnt/lfs（=$LFS），宿主 sources -> $LFS/sources。
+# 挂载点约定见 docs/conventions.md：宿主 $LFS_ROOT -> /workspace，
+# 宿主 $LFS_ROOT/mnt/lfs -> /mnt/lfs（=$LFS），宿主 sources -> $LFS/sources。
 set -euo pipefail
 export LC_ALL=C LANG=C
 
-LFS_ROOT="${LFS_ROOT:-/root/lfs}"
+LFS_ROOT="${LFS_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 LFS_MNT="${LFS_MNT:-$LFS_ROOT/mnt/lfs}"
 SOURCES_DIR="${SOURCES_DIR:-$LFS_ROOT/sources}"
 DOCKER_DIR="${DOCKER_DIR:-$LFS_ROOT/docker}"
-DOCKER_IMAGE="${DOCKER_IMAGE:-lfs-build:13.0-systemd}"
-CONTAINER="${CONTAINER:-lfs-build}"
+DOCKER_IMAGE="${DOCKER_IMAGE:-lfs-build-$(basename "$LFS_ROOT"):13.0-systemd}"
+CONTAINER="${CONTAINER:-lfs-build-$(basename "$LFS_ROOT")}"
 C_LFS="${C_LFS:-/mnt/lfs}"
 
 die() { echo "错误：$*" >&2; exit 1; }

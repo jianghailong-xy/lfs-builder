@@ -44,7 +44,7 @@ echo "开始时间：$(date -Is)"
 echo "手册简介：The Binutils package contains a linker, an assembler, and other tools"
 echo "  for handling object files."
 echo "手册数据：Approximate build time 1.7 SBU，Required disk space 835 MB"
-echo "手册存档：/workspace/docs/book/chapter08-binutils.html（宿主机 /root/lfs/docs/book/）"
+echo "手册存档：/workspace/docs/book/chapter08-binutils.html（宿主机 $LFS_ROOT/docs/book/）"
 echo
 
 echo "----- 环境（手册 §7.4 进入 chroot 后的环境） -----"

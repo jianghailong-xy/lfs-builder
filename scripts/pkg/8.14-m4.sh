@@ -25,7 +25,7 @@ echo "===== LFS 13.0-systemd §8.14 M4-$VER ====="
 echo "开始时间：$(date -Is)"
 echo "手册简介：The M4 package contains a macro processor."
 echo "手册数据：Approximate build time 0.4 SBU，Required disk space 61 MB"
-echo "手册存档：/workspace/docs/book/chapter08-m4.html（宿主机 /root/lfs/docs/book/）"
+echo "手册存档：/workspace/docs/book/chapter08-m4.html（宿主机 $LFS_ROOT/docs/book/）"
 echo
 
 echo "----- 环境（手册 §7.4 进入 chroot 后的环境） -----"
@@ -500,7 +500,7 @@ echo
 
 echo "----- 保留日志摘要后清理构建目录（手册 iii：删除解包出来的源码目录） -----"
 echo "（摘要先写到 /sources —— 它是宿主机 bind mount，随后由宿主机侧 run-8.14.sh"
-echo "  移入 /root/lfs/logs/packages/，不会在镜像内留下多余目录）"
+echo "  移入 $LFS_ROOT/logs/packages/，不会在镜像内留下多余目录）"
 echo "  configure    完整输出：$CONFLOG"
 echo "  make         完整输出：$MAKELOG"
 echo "  make check   完整输出：$CHECKLOG"

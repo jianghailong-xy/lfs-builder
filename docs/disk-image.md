@@ -1,5 +1,7 @@
 # LFS raw 磁盘镜像：布局、设备与操作
 
+> 本文中的 `/root/lfs` 是原始构建机的示例/实测路径；实际以当前 clone 的仓库根目录为准。
+
 创建日期：2026-08-24　脚本：[`scripts/disk-image.sh`](../scripts/disk-image.sh)
 入口：`make image` / `make mount` / `make umount` / `make status`
 

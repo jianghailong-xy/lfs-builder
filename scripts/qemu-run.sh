@@ -1,7 +1,7 @@
 #!/bin/bash
 set -euo pipefail
 
-ROOT=/root/lfs
+ROOT="${LFS_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 IMAGE=${IMAGE:-$ROOT/images/lfs.img}
 LOG=${QEMU_LOG:-$ROOT/logs/host/qemu-serial.log}
 MEMORY=${QEMU_MEMORY:-2048}

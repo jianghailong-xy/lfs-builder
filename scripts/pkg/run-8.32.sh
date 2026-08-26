@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 set -uo pipefail
-LFS_ROOT=/root/lfs
+LFS_ROOT="${LFS_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 LOG=$LFS_ROOT/logs/packages/8.32-sed-4.9.log
 PREP_LOG=$LFS_ROOT/logs/host/chroot-prep.log
-CONTAINER=${CONTAINER:-lfs-build}
+CONTAINER="${CONTAINER:-lfs-build-$(basename "$LFS_ROOT")}"
 mkdir -p "$LFS_ROOT/logs/host" "$LFS_ROOT/logs/packages"
 
 {

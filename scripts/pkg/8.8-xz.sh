@@ -28,7 +28,7 @@ echo "  It provides capabilities for the lzma and the newer xz compression forma
 echo "  Compressing text files with xz yields a better compression percentage than with"
 echo "  the traditional gzip or bzip2 commands."
 echo "手册数据：Approximate build time 0.1 SBU，Required disk space 24 MB"
-echo "手册存档：/workspace/docs/book/chapter08-xz.html（宿主机 /root/lfs/docs/book/）"
+echo "手册存档：/workspace/docs/book/chapter08-xz.html（宿主机 $LFS_ROOT/docs/book/）"
 echo
 
 echo "----- 环境（手册 §7.4 进入 chroot 后的环境） -----"
@@ -401,8 +401,8 @@ echo
 
 echo "----- 保留测试摘要后清理构建目录（手册 iii：删除解包出来的源码目录） -----"
 echo "（摘要先写到 /sources —— 它是宿主机 bind mount，随后由宿主机侧 run-8.8.sh"
-echo "  移入 /root/lfs/logs/packages/，不会在镜像内留下多余目录）"
-echo "  make check 完整输出已在 $CHECKLOG（= 宿主 /root/lfs/sources/.xz-make-check.log）"
+echo "  移入 $LFS_ROOT/logs/packages/，不会在镜像内留下多余目录）"
+echo "  make check 完整输出已在 $CHECKLOG（= 宿主 $LFS_ROOT/sources/.xz-make-check.log）"
 cd /sources
 rm -rf "$SRCDIR"
 [ -d "/sources/$SRCDIR" ] && { echo "错误：源码目录未清理" >&2; exit 1; }

@@ -1,5 +1,5 @@
 # Linux From Scratch 13.0-systemd —— Docker 构建 / QEMU 启动
-# 工作目录固定为 /root/lfs。约定详见 docs/conventions.md。
+# 工作目录由本 Makefile 的位置自动推导。约定详见 docs/conventions.md。
 #
 # 当前可用目标：dirs、doctor、status、image、mount、umount、sources、env、
 #               build-chapter*、build-all、grub、qemu、container-*、lfs-shell、help
@@ -8,7 +8,8 @@ SHELL := /bin/bash
 .DEFAULT_GOAL := help
 
 # ---- 宿主机路径（唯一事实来源，所有脚本从这里取值） -----------------------
-LFS_ROOT      := /root/lfs
+LFS_ROOT      := $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
+CLONE_NAME    := $(notdir $(LFS_ROOT))
 SOURCES_DIR   := $(LFS_ROOT)/sources
 SCRIPTS_DIR   := $(LFS_ROOT)/scripts
 DOCS_DIR      := $(LFS_ROOT)/docs
@@ -24,7 +25,8 @@ IMAGE         := $(IMAGES_DIR)/lfs.img
 IMAGE_SIZE_GB ?= 30
 MIN_FREE_GB   ?= 60
 IMAGE_LABEL   ?= LFS
-IMAGE_UUID    ?= e0292aee-a40c-414b-a00b-d3d2685b6b0d
+# 留空时由 mkfs.ext4 为每次创建随机生成；也可从 make 命令行显式覆盖。
+IMAGE_UUID    ?=
 # image: FORCE=1 允许删除并重建已存在的镜像
 FORCE         ?= 0
 IMAGE_INFO    := $(IMAGE).info
@@ -42,8 +44,8 @@ GRUB_SCRIPT      := $(SCRIPTS_DIR)/install-grub.sh
 C_PROJECT     := /workspace
 C_LFS         := /mnt/lfs
 C_SOURCES     := /mnt/lfs/sources
-DOCKER_IMAGE  ?= lfs-build:13.0-systemd
-CONTAINER     ?= lfs-build
+DOCKER_IMAGE  ?= lfs-build-$(CLONE_NAME):13.0-systemd
+CONTAINER     ?= lfs-build-$(CLONE_NAME)
 
 SKEL_DIRS := $(SOURCES_DIR) $(SCRIPTS_DIR) $(DOCS_DIR) $(DOCKER_DIR) \
              $(IMAGES_DIR) $(LOGS_DIR) $(PKG_LOGS_DIR) $(HOST_LOGS_DIR) $(LFS_MNT)

@@ -19,7 +19,7 @@ echo "===== LFS 13.0-systemd §8.4 Iana-Etc-$VER ====="
 echo "开始时间：$(date -Is)"
 echo "手册简介：The Iana-Etc package provides data for network services and protocols."
 echo "手册数据：Approximate build time less than 0.1 SBU，Required disk space 4.8 MB"
-echo "手册存档：/workspace/docs/book/chapter08-iana-etc.html（宿主机 /root/lfs/docs/book/）"
+echo "手册存档：/workspace/docs/book/chapter08-iana-etc.html（宿主机 $LFS_ROOT/docs/book/）"
 echo
 
 echo "----- 环境（手册 §7.4 进入 chroot 后的环境） -----"

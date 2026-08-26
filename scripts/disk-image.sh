@@ -11,7 +11,7 @@
 # backing file 位于 $IMAGES_DIR 内，否则立即中止，绝不触碰宿主机真实磁盘。
 set -u -o pipefail
 
-LFS_ROOT="${LFS_ROOT:-/root/lfs}"
+LFS_ROOT="${LFS_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 IMAGES_DIR="${IMAGES_DIR:-$LFS_ROOT/images}"
 IMAGE="${IMAGE:-$IMAGES_DIR/lfs.img}"
 IMAGE_SIZE_GB="${IMAGE_SIZE_GB:-30}"
@@ -19,7 +19,7 @@ MIN_FREE_GB="${MIN_FREE_GB:-60}"
 LFS_MNT="${LFS_MNT:-$LFS_ROOT/mnt/lfs}"
 HOST_LOGS_DIR="${HOST_LOGS_DIR:-$LFS_ROOT/logs/host}"
 IMAGE_LABEL="${IMAGE_LABEL:-LFS}"
-IMAGE_UUID="${IMAGE_UUID:-e0292aee-a40c-414b-a00b-d3d2685b6b0d}"
+IMAGE_UUID="${IMAGE_UUID:-}"
 # 镜像元信息（设备无关的部分：分区布局、UUID），供后续 fstab / GRUB 任务读取
 INFO_FILE="${INFO_FILE:-$IMAGE.info}"
 
@@ -133,14 +133,16 @@ EOF
     [ -b "$part" ] || { losetup -d "$dev"; die "分区节点未出现：$part"; }
     ok "分区节点：$part"
 
-    if ! mkfs.ext4 -q -F -L "$IMAGE_LABEL" -U "$IMAGE_UUID" -m 1 "$part"; then
+    local -a mkfs_args=(-q -F -L "$IMAGE_LABEL" -m 1)
+    [ -n "$IMAGE_UUID" ] && mkfs_args+=(-U "$IMAGE_UUID")
+    if ! mkfs.ext4 "${mkfs_args[@]}" "$part"; then
         losetup -d "$dev"; die "mkfs.ext4 失败：$part"
     fi
-    ok "ext4 格式化完成（label=$IMAGE_LABEL，UUID=$IMAGE_UUID，保留块 1%）"
 
     local uuid ptuuid
     uuid="$(blkid -s UUID -o value "$part")"
     ptuuid="$(blkid -s PTUUID -o value "$dev" 2>/dev/null)"
+    ok "ext4 格式化完成（label=$IMAGE_LABEL，UUID=$uuid，保留块 1%）"
 
     head_ "记录镜像信息"
     cat > "$INFO_FILE" <<EOF

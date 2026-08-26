@@ -1,7 +1,10 @@
 # Linux From Scratch 13.0-systemd —— Docker 构建 / QEMU 启动
 
-在 `/root/lfs` 中用 Docker 提供可复现的隔离构建环境，产出可由
+本仓库用 Docker 提供可复现的隔离构建环境，产出可由
 `qemu-system-x86_64` 启动的独立 LFS raw 磁盘镜像。
+
+> 文档中的 `/root/lfs` 是原始构建机的示例或历史记录路径；实际路径始终以
+> 当前 clone 的仓库根目录为准。
 
 - 手册版本固定为 **LFS 13.0-systemd**（不使用 stable / development）
 - 目标：x86_64 / BIOS + GRUB / ext4 根文件系统 / VirtIO 磁盘 + 串口控制台
@@ -20,11 +23,15 @@
 
 ## 快速开始
 
+仓库可 clone 到任意目录；无论从哪里调用，`make` 都会以 Makefile 所在的仓库根目录
+作为 `LFS_ROOT`，脚本单独执行时也会从自身位置定位仓库根。
+
 下面是从空白环境到串口出现 `lfs login:` 的最短有序路径。除第一条外，
 每一步都以前一步成功为前置条件；耗时是本机量级，网络和 CPU 会影响实际时间。
 
 ```sh
-cd /root/lfs
+git clone git@github.com:jianghailong-xy/lfs-builder.git /path/to/lfs-builder
+cd /path/to/lfs-builder
 make doctor    # 前置：宿主机；约 1 分钟，检查 Docker/QEMU/loop/GRUB/磁盘/KVM
 make image     # 前置：doctor 通过；约 1 分钟，创建 30G raw 镜像（已有镜像会拒绝覆盖）
 make mount     # 前置：image；数秒，关联 loop 并挂载到 mnt/lfs
@@ -48,6 +55,9 @@ initramfs，也不写 `initrd` 行，因此根盘不依赖 VirtIO 或“第一�
 KVM 属可选项，缺失只告警。
 
 ## 从零复现
+
+从零复现同样支持任意 clone 目录，`make` 始终以仓库根为工作目录；下文出现的
+`/root/lfs` 仅代表原始构建机上的示例路径。
 
 完整执行第 5–8 章在本机 `-j8` 实测约 **19 小时**（其中 §8.30 GCC 约
 **4 小时**、§8.5 Glibc 约 **49 分钟**）；加上下载、环境准备、

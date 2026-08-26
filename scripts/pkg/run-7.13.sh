@@ -9,13 +9,13 @@
 #
 # 完整输出落到 logs/packages/7.13-cleanup-and-backup.log。
 set -uo pipefail
-LFS_ROOT=/root/lfs
+LFS_ROOT="${LFS_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 LFS=$LFS_ROOT/mnt/lfs                 # 宿主机上的 $LFS（容器内同为 /mnt/lfs）
 LOG=$LFS_ROOT/logs/packages/7.13-cleanup-and-backup.log
 PREP_LOG=$LFS_ROOT/logs/host/chroot-prep.log
 BACKUP_DIR=${BACKUP_DIR:-$LFS_ROOT/backups}
 BACKUP=$BACKUP_DIR/lfs-temp-tools-13.0-systemd.tar.xz
-CONTAINER=${CONTAINER:-lfs-build}
+CONTAINER="${CONTAINER:-lfs-build-$(basename "$LFS_ROOT")}"
 SKIP_BACKUP=${SKIP_BACKUP:-0}
 
 mkdir -p "$LFS_ROOT/logs/host" "$LFS_ROOT/logs/packages" "$BACKUP_DIR"
@@ -72,7 +72,7 @@ echo
 echo "本项目对应关系（见 docs/conventions.md）："
 echo "  手册的「exit 退出 chroot」   → 本项目每条 chroot 命令都是非交互的一次性进入，"
 echo "                                 §7.13.1 的 chroot 进程已在上一步正常退出。"
-echo "  手册的「host system 上的 root」→ 本脚本，运行在宿主机 /root/lfs 下。"
+echo "  手册的「host system 上的 root」→ 本脚本，运行在宿主机 $LFS_ROOT 下。"
 echo "  \$LFS                        → $LFS"
 echo "  手册的 \$HOME/lfs-temp-tools-13.0-systemd.tar.xz"
 echo "                               → $BACKUP"
@@ -103,11 +103,11 @@ echo "----- 项目特有的一处偏离：\$LFS/sources -----"
 echo "手册里 \$LFS/sources 是根分区上的普通目录，所以备份天然包含源码包（手册："
 echo "  Since the sources are located under \$LFS, they are included in the backup archive"
 echo "  as well, so they do not need to be downloaded again）。"
-echo "本项目按 docs/conventions.md 把宿主机的 /root/lfs/sources 以 bind mount 的形式"
+echo "本项目按 docs/conventions.md 把宿主机的 $LFS_ROOT/sources 以 bind mount 的形式"
 echo "  挂到 \$LFS/sources，源码包并不在镜像里，重建镜像也不会丢失，因此："
 echo "    · 打包时用 tar --exclude=./sources 排除该挂载点（否则 604 MB 已压缩的 tarball"
 echo "      会被再压一遍，既拖慢打包又毫无收益）；"
-echo "    · 手册「不必重新下载」的效果由宿主机上常驻的 /root/lfs/sources 直接提供；"
+echo "    · 手册「不必重新下载」的效果由宿主机上常驻的 $LFS_ROOT/sources 直接提供；"
 echo "    · 相应地，§7.13.3 Restore 也必须改用先卸载 sources 再清空 \$LFS 的顺序，"
 echo "      否则手册的 rm -rf ./* 会穿过 bind mount 删掉宿主机上的源码缓存。"
 echo "      可执行的还原步骤见 docs/checkpoint-ch5-7.md。"

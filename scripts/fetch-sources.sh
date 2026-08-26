@@ -7,14 +7,14 @@
 #   fetch-sources.sh all       lists + download + verify（默认）
 #   fetch-sources.sh status    只读汇总
 #
-# 源码固定落在宿主机 /root/lfs/sources（= 容器内 $LFS/sources），
+# 源码固定落在宿主机 $LFS_ROOT/sources（= 容器内 $LFS/sources），
 # 与镜像解耦，镜像重建不必重新下载。约定见 docs/conventions.md。
 set -euo pipefail
 # md5sum/wget 的输出要被解析，必须锁定 C locale（宿主机是 zh_CN，
 # 否则 "FAILED"/"OK" 会被翻译成中文，判定逻辑全部失效）
 export LC_ALL=C LANG=C
 
-LFS_ROOT="${LFS_ROOT:-/root/lfs}"
+LFS_ROOT="${LFS_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 SOURCES_DIR="${SOURCES_DIR:-$LFS_ROOT/sources}"
 HOST_LOGS_DIR="${HOST_LOGS_DIR:-$LFS_ROOT/logs/host}"
 LOG="$HOST_LOGS_DIR/sources.log"

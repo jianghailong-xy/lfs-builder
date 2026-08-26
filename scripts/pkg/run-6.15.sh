@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # 宿主机侧驱动：在构建容器内以 lfs 用户执行 §6.15，完整输出落到日志。
 set -uo pipefail
-LFS_ROOT=/root/lfs
+LFS_ROOT="${LFS_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 LOG=$LFS_ROOT/logs/packages/6.15-tar-1.35.log
 
 {

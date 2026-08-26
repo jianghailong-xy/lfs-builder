@@ -24,7 +24,7 @@ echo "手册简介：Zstandard is a real-time compression algorithm, providing h
 echo "  compression ratios. It offers a very wide range of compression / speed"
 echo "  trade-offs, while being backed by a very fast decoder."
 echo "手册数据：Approximate build time 0.4 SBU，Required disk space 86 MB"
-echo "手册存档：/workspace/docs/book/chapter08-zstd.html（宿主机 /root/lfs/docs/book/）"
+echo "手册存档：/workspace/docs/book/chapter08-zstd.html（宿主机 $LFS_ROOT/docs/book/）"
 echo
 
 echo "----- 环境（手册 §7.4 进入 chroot 后的环境） -----"
@@ -472,8 +472,8 @@ echo
 
 echo "----- 保留测试摘要后清理构建目录（手册 iii：删除解包出来的源码目录） -----"
 echo "（摘要先写到 /sources —— 它是宿主机 bind mount，随后由宿主机侧 run-8.10.sh"
-echo "  移入 /root/lfs/logs/packages/，不会在镜像内留下多余目录）"
-echo "  make check 完整输出已在 $CHECKLOG（= 宿主 /root/lfs/sources/.zstd-make-check.log）"
+echo "  移入 $LFS_ROOT/logs/packages/，不会在镜像内留下多余目录）"
+echo "  make check 完整输出已在 $CHECKLOG（= 宿主 $LFS_ROOT/sources/.zstd-make-check.log）"
 cd /sources
 rm -rf "$SRCDIR"
 [ -d "/sources/$SRCDIR" ] && { echo "错误：源码目录未清理" >&2; exit 1; }

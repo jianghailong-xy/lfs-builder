@@ -1,5 +1,7 @@
 # 源码包与补丁（LFS 13.0-systemd）
 
+> 本文中的 `/root/lfs` 是示例路径；实际以当前 clone 的仓库根目录为准。
+
 本文件记录 `sources/` 的来源、校验方式与缓存复用策略。
 操作入口：`make sources` / `make sources-verify` / `make sources-status`，
 实现见 [`scripts/fetch-sources.sh`](../scripts/fetch-sources.sh)。

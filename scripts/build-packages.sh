@@ -2,7 +2,7 @@
 # 按手册小节顺序编排已有的宿主机侧 run-<节号>.sh；不改动 package 脚本。
 set -euo pipefail
 
-LFS_ROOT="${LFS_ROOT:-/root/lfs}"
+LFS_ROOT="${LFS_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}"
 PKG_DIR="$LFS_ROOT/scripts/pkg"
 PKG_LOGS_DIR="${PKG_LOGS_DIR:-$LFS_ROOT/logs/packages}"
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # 宿主机侧驱动：在构建容器内以 lfs 用户执行 §5.4，完整输出落到日志。
 set -uo pipefail
-LFS_ROOT=/root/lfs
+LFS_ROOT="${LFS_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 LOG=$LFS_ROOT/logs/packages/5.4-linux-6.18.10-api-headers.log
 
 {

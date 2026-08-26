@@ -1,5 +1,7 @@
 # 构建环境：Docker 容器 + 手册第 2/4 章准备
 
+> 本文中的 `/root/lfs` 是原始构建机的示例路径；实际以当前 clone 的仓库根目录为准。
+
 第 5 章起的所有 package 都在容器 `lfs-build` 内构建，产物落在 bind mount 出去的
 镜像分区（`$LFS`）与宿主机日志目录上，容器本身可随时销毁重建。
 路径与挂载点约定见 [`conventions.md`](conventions.md)。

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # 宿主机侧驱动：在构建容器内以 lfs 用户执行 §6.8，完整输出落到日志。
 set -uo pipefail
-LFS_ROOT=/root/lfs
+LFS_ROOT="${LFS_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 LOG=$LFS_ROOT/logs/packages/6.8-findutils-4.10.0.log
 
 {

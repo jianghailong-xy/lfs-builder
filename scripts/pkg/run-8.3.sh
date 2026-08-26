@@ -3,10 +3,10 @@
 # 在 chroot 内执行 §8.3 Man-pages-6.17，完整输出落到
 # logs/packages/8.3-man-pages-6.17.log。
 set -uo pipefail
-LFS_ROOT=/root/lfs
+LFS_ROOT="${LFS_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 LOG=$LFS_ROOT/logs/packages/8.3-man-pages-6.17.log
 PREP_LOG=$LFS_ROOT/logs/host/chroot-prep.log
-CONTAINER=${CONTAINER:-lfs-build}
+CONTAINER="${CONTAINER:-lfs-build-$(basename "$LFS_ROOT")}"
 
 mkdir -p "$LFS_ROOT/logs/host" "$LFS_ROOT/logs/packages"
 
@@ -31,8 +31,8 @@ fi
   echo "##### 宿主机时间：$(date -Is)"
   echo "##### 容器：$CONTAINER（镜像 lfs-build:13.0-systemd）"
   echo "##### 执行位置：chroot 环境内（手册 §7.4），chroot 根 = \$LFS = /mnt/lfs"
-  echo "#####   = 宿主 /root/lfs/mnt/lfs = loop 挂载的镜像根分区"
-  echo "##### 源码：chroot 内 /sources = 宿主 /root/lfs/sources"
+  echo "#####   = 宿主 $LFS_ROOT/mnt/lfs = loop 挂载的镜像根分区"
+  echo "##### 源码：chroot 内 /sources = 宿主 $LFS_ROOT/sources"
   echo "##### 前置的 §7.2/§7.3/§7.5/§7.6 已在本次运行中确认就绪，其完整输出见"
   echo "#####   $PREP_LOG"
   echo "##### 第 8 章的 §8.1 Introduction 与 §8.2 Package Management 为纯说明性小节，"

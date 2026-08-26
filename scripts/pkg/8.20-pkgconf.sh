@@ -30,7 +30,7 @@ echo "手册简介：The pkgconf package is a successor to pkg-config and contai
 echo "  passing the include path and/or library paths to build tools during the configure"
 echo "  and make phases of package installations."
 echo "手册数据：Approximate build time less than 0.1 SBU，Required disk space 5.0 MB"
-echo "手册存档：/workspace/docs/book/chapter08-pkgconf.html（宿主机 /root/lfs/docs/book/）"
+echo "手册存档：/workspace/docs/book/chapter08-pkgconf.html（宿主机 $LFS_ROOT/docs/book/）"
 echo
 
 echo "----- 环境（手册 §7.4 进入 chroot 后的环境） -----"
@@ -600,7 +600,7 @@ echo
 
 echo "----- 保留日志摘要后清理构建目录（手册 iii：删除解包出来的源码目录） -----"
 echo "（摘要先写到 /sources —— 它是宿主机 bind mount，随后由宿主机侧 run-8.20.sh"
-echo "  移入 /root/lfs/logs/packages/，不会在镜像内留下多余目录）"
+echo "  移入 $LFS_ROOT/logs/packages/，不会在镜像内留下多余目录）"
 echo "  configure    完整输出：$CONFLOG"
 echo "  make         完整输出：$MAKELOG"
 echo "  make install 完整输出：$INSTLOG"

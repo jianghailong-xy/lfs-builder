@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -uo pipefail
-LFS_ROOT=/root/lfs
+LFS_ROOT="${LFS_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 LOG=$LFS_ROOT/logs/packages/8.50-libelf-from-elfutils-0.194.log
-CONTAINER=${CONTAINER:-lfs-build}
+CONTAINER="${CONTAINER:-lfs-build-$(basename "$LFS_ROOT")}"
 mkdir -p "$LFS_ROOT/logs/packages"
 
 {

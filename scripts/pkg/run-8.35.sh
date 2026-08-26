@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -uo pipefail
-LFS_ROOT=/root/lfs
+LFS_ROOT="${LFS_ROOT:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 LOG=$LFS_ROOT/logs/packages/8.35-bison-3.8.2.log
-CONTAINER=${CONTAINER:-lfs-build}
+CONTAINER="${CONTAINER:-lfs-build-$(basename "$LFS_ROOT")}"
 mkdir -p "$LFS_ROOT/logs/packages"
 docker exec "$CONTAINER" bash /workspace/scripts/chroot.sh prep >> "$LOG" 2>&1
 rc=$?

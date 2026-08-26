@@ -1,5 +1,8 @@
 # LFS 13.0-systemd 构建约定
 
+> 本文中的 `/root/lfs` 是原始构建机的示例路径；实际 `LFS_ROOT` 由当前 clone 的
+> Makefile 位置推导，仓库可位于任意目录。
+
 本文件是全项目的路径与挂载点唯一约定，**所有 package 任务必须遵循**。
 与 `Makefile` 顶部的变量一一对应，改动必须同步两处。
 
@@ -14,7 +17,7 @@
 
 | 宿主机路径 | 用途 |
 | --- | --- |
-| `/root/lfs` | 项目根（`LFS_ROOT`），固定不变 |
+| `/root/lfs` | 项目根（`LFS_ROOT`；此处为示例，实际随 clone 目录变化） |
 | `/root/lfs/Makefile` | 全部操作入口（`make doctor` / `dirs` / `status` …） |
 | `/root/lfs/scripts/` | 可复现脚本（`host-doctor.sh` 等） |
 | `/root/lfs/docs/` | 操作文档与约定（本文件） |
