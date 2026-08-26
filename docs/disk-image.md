@@ -1,6 +1,8 @@
 # LFS raw 磁盘镜像：布局、设备与操作
 
-> 本文中的 `/root/lfs` 是原始构建机的示例/实测路径；实际以当前 clone 的仓库根目录为准。
+> 本文中的 `~/lfs-builder` 是示例路径，实际以当前 clone 的仓库根目录为准。
+> 下方分区表、loop/挂载拓扑和执行后核对中的 `/root/lfs` 则是原始构建机当时的
+> 实测路径，特意保留以免历史记录失真。
 
 创建日期：2026-08-24　脚本：[`scripts/disk-image.sh`](../scripts/disk-image.sh)
 入口：`make image` / `make mount` / `make umount` / `make status`
@@ -9,7 +11,7 @@
 
 | 项 | 值 |
 | --- | --- |
-| 镜像文件 | `/root/lfs/images/lfs.img`（权限 `0600`） |
+| 镜像文件 | `~/lfs-builder/images/lfs.img`（权限 `0600`） |
 | 逻辑容量 | 30 GiB（`IMAGE_SIZE_GB`，= 32212254720 字节 / 62914560 扇区） |
 | 实际占用 | 稀疏文件，格式化后约 133 MiB，按写入增长 |
 | 创建方式 | `qemu-img create -f raw`（raw 格式，QEMU 可直接作为 VirtIO 磁盘使用） |
@@ -71,8 +73,8 @@ loop 设备号 **不固定**：由 `losetup -f` 自动选取，重新关联后�
 
 对应 `docs/conventions.md` §3，`scripts/disk-image.sh` 在动手前逐条断言：
 
-1. 镜像路径必须解析到 `/root/lfs/images/` 内，否则拒绝。
-2. 挂载点必须恰为 `/root/lfs/mnt/lfs`，且目录须存在。
+1. 镜像路径必须解析到 `~/lfs-builder/images/` 内，否则拒绝。
+2. 挂载点必须恰为 `~/lfs-builder/mnt/lfs`，且目录须存在。
 3. 任何将被 `losetup -d` / `umount` 的设备，先用 `losetup -O BACK-FILE` 反查，
    **backing file 不在 `images/` 内就立即中止** —— 这保证脚本无法误伤
    宿主机已有的 loop 设备，更不会碰到 `/dev/nvme*`、`/dev/sd*`。
@@ -86,6 +88,6 @@ loop 设备号 **不固定**：由 `losetup -f` 自动选取，重新关联后�
 
 - 容器启动前必须先 `make mount`（`docs/conventions.md` §2 硬性规则 2）：
   宿主 `mnt/lfs` 已是镜像根分区后，再 bind 到容器 `/mnt/lfs`（`$LFS`）。
-- `sources/` 位于宿主机 `/root/lfs/sources`，不占镜像空间，
+- `sources/` 位于宿主机 `~/lfs-builder/sources`，不占镜像空间，
   重建镜像不会丢源码包。
 - 目前根分区仅有 `lost+found`；LFS 手册 §4.2 起的目录骨架由后续任务创建。

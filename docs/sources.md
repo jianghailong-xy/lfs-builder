@@ -1,6 +1,6 @@
 # 源码包与补丁（LFS 13.0-systemd）
 
-> 本文中的 `/root/lfs` 是示例路径；实际以当前 clone 的仓库根目录为准。
+> 本文中的 `~/lfs-builder` 是示例路径；实际以当前 clone 的仓库根目录为准。
 
 本文件记录 `sources/` 的来源、校验方式与缓存复用策略。
 操作入口：`make sources` / `make sources-verify` / `make sources-status`，
@@ -33,7 +33,7 @@ cd $LFS/sources && md5sum -c md5sums
 
 | 宿主机 | 容器内 | 说明 |
 | --- | --- | --- |
-| `/root/lfs/sources` | `/mnt/lfs/sources`（= `$LFS/sources`） | bind mount |
+| `~/lfs-builder/sources` | `/mnt/lfs/sources`（= `$LFS/sources`） | bind mount |
 
 源码**不在镜像里**：`sources/` 是宿主机目录，通过 bind mount 出现在容器的
 `$LFS/sources`。因此

@@ -3,8 +3,9 @@
 本仓库用 Docker 提供可复现的隔离构建环境，产出可由
 `qemu-system-x86_64` 启动的独立 LFS raw 磁盘镜像。
 
-> 文档中的 `/root/lfs` 是原始构建机的示例或历史记录路径；实际路径始终以
-> 当前 clone 的仓库根目录为准。
+> 文档中的 `~/lfs-builder` 只是示例路径；仓库可 clone 到任意目录，实际路径始终以
+> 当前 clone 的仓库根目录为准。checkpoint、实测记录或日志摘录中的原始绝对路径
+> 是原始构建机当时的实际路径，特意保留以免历史记录失真。
 
 - 手册版本固定为 **LFS 13.0-systemd**（不使用 stable / development）
 - 目标：x86_64 / BIOS + GRUB / ext4 根文件系统 / VirtIO 磁盘 + 串口控制台
@@ -24,14 +25,15 @@
 ## 快速开始
 
 仓库可 clone 到任意目录；无论从哪里调用，`make` 都会以 Makefile 所在的仓库根目录
-作为 `LFS_ROOT`，脚本单独执行时也会从自身位置定位仓库根。
+作为工作目录和 `LFS_ROOT`，脚本单独执行时也会从自身位置定位仓库根。下文的
+`~/lfs-builder` 只是示例路径，可替换为任意 clone 目录。
 
 下面是从空白环境到串口出现 `lfs login:` 的最短有序路径。除第一条外，
 每一步都以前一步成功为前置条件；耗时是本机量级，网络和 CPU 会影响实际时间。
 
 ```sh
-git clone git@github.com:jianghailong-xy/lfs-builder.git /path/to/lfs-builder
-cd /path/to/lfs-builder
+git clone git@github.com:jianghailong-xy/lfs-builder.git ~/lfs-builder
+cd ~/lfs-builder
 make doctor    # 前置：宿主机；约 1 分钟，检查 Docker/QEMU/loop/GRUB/磁盘/KVM
 make image     # 前置：doctor 通过；约 1 分钟，创建 30G raw 镜像（已有镜像会拒绝覆盖）
 make mount     # 前置：image；数秒，关联 loop 并挂载到 mnt/lfs
@@ -57,7 +59,7 @@ KVM 属可选项，缺失只告警。
 ## 从零复现
 
 从零复现同样支持任意 clone 目录，`make` 始终以仓库根为工作目录；下文出现的
-`/root/lfs` 仅代表原始构建机上的示例路径。
+`~/lfs-builder` 只是示例路径，可替换为实际 clone 目录。
 
 完整执行第 5–8 章在本机 `-j8` 实测约 **19 小时**（其中 §8.30 GCC 约
 **4 小时**、§8.5 Glibc 约 **49 分钟**）；加上下载、环境准备、
@@ -81,7 +83,7 @@ GRUB 安装和首次启动，应按一天量级预留时间。空间至少包括
 恢复前先校验相应的 `.sha256` 文件。例如使用第 5–7 章快照：
 
 ```sh
-cd /root/lfs
+cd ~/lfs-builder
 sha256sum -c backups/lfs-temp-tools-13.0-systemd.tar.xz.sha256
 make mount
 # 危险的清空/还原细节与安全核对必须逐项照此文档执行：
@@ -97,14 +99,14 @@ make qemu
 `backups/lfs-ch8-pre-strip.tar.zst.sha256`，并按快照配套恢复说明跳过第 5–8 章；
 不要运行 `make build-all`。快照恢复会覆盖目标镜像内容，不能作为普通的断点续跑命令。
 
-还原会清空镜像根文件系统，务必确认 `$LFS` 精确为 `/root/lfs/mnt/lfs`、其来源为
+还原会清空镜像根文件系统，务必确认 `$LFS` 精确为 `~/lfs-builder/mnt/lfs`、其来源为
 项目镜像的 loop 分区，并先卸载其下所有 bind/虚拟文件系统。完整、可复制的还原步骤
 及检查项见 [`docs/checkpoint-ch5-7.md`](docs/checkpoint-ch5-7.md#6-7133-restore--适配本项目布局的还原步骤)。
 
 ## 目录结构
 
 ```
-/root/lfs
+~/lfs-builder
 ├── Makefile                 全部操作入口
 ├── README.md                本文件
 ├── docs/                    约定与体检结论
@@ -126,15 +128,15 @@ make qemu
 
 | 宿主机 | 容器内 | 说明 |
 | --- | --- | --- |
-| `/root/lfs` | `/workspace` | 项目根：脚本、文档、日志 |
-| `/root/lfs/mnt/lfs` | `/mnt/lfs` | **`$LFS`**，镜像根分区，与手册一致 |
-| `/root/lfs/sources` | `/mnt/lfs/sources` | 源码与补丁，不占镜像空间 |
+| `~/lfs-builder` | `/workspace` | 项目根：脚本、文档、日志 |
+| `~/lfs-builder/mnt/lfs` | `/mnt/lfs` | **`$LFS`**，镜像根分区，与手册一致 |
+| `~/lfs-builder/sources` | `/mnt/lfs/sources` | 源码与补丁，不占镜像空间 |
 
 容器内恒有 `export LFS=/mnt/lfs`；package 日志固定写入
 `/workspace/logs/packages/<节号>-<包名>-<版本>.log`。
 
 ## 安全边界
 
-只操作 `/root/lfs/images/` 下的镜像及其 loop 设备。执行任何
+只操作 `~/lfs-builder/images/` 下的镜像及其 loop 设备。执行任何
 `losetup` / `mount` / `umount` / `mkfs` / `grub-install` 前先用 `make status`
 确认精确目标，禁止触碰宿主机 `/dev/nvme*`、`/dev/sd*` 等真实磁盘与挂载点。

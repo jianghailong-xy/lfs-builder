@@ -1,6 +1,6 @@
 # 构建环境：Docker 容器 + 手册第 2/4 章准备
 
-> 本文中的 `/root/lfs` 是原始构建机的示例路径；实际以当前 clone 的仓库根目录为准。
+> 本文中的 `~/lfs-builder` 是示例路径；实际以当前 clone 的仓库根目录为准。
 
 第 5 章起的所有 package 都在容器 `lfs-build` 内构建，产物落在 bind mount 出去的
 镜像分区（`$LFS`）与宿主机日志目录上，容器本身可随时销毁重建。
@@ -9,7 +9,7 @@
 ## 1. 一键就绪
 
 ```sh
-make mount     # 先在宿主机挂好镜像分区（必须，容器只认已挂载的 /root/lfs/mnt/lfs）
+make mount     # 先在宿主机挂好镜像分区（必须，容器只认已挂载的 ~/lfs-builder/mnt/lfs）
 make env       # = container-build + container-up + container-prepare + container-check
 ```
 
@@ -36,15 +36,15 @@ make env       # = container-build + container-up + container-prepare + containe
 
 ```sh
 docker run -d --name lfs-build --privileged \
-  -v /root/lfs:/workspace \
-  --mount type=bind,source=/root/lfs/mnt/lfs,target=/mnt/lfs,bind-propagation=rshared \
-  -v /root/lfs/sources:/mnt/lfs/sources \
+  -v ~/lfs-builder:/workspace \
+  --mount type=bind,source=~/lfs-builder/mnt/lfs,target=/mnt/lfs,bind-propagation=rshared \
+  -v ~/lfs-builder/sources:/mnt/lfs/sources \
   -w /workspace -e LFS=/mnt/lfs \
   lfs-build:13.0-systemd sleep infinity
 ```
 
-`scripts/lfs-container.sh up` 在启动前强制校验：`/root/lfs/mnt/lfs` 已挂载、来源是
-`/dev/loop*`、且该 loop 指向 `/root/lfs/images/` 下的镜像；任一不满足直接拒绝启动，
+`scripts/lfs-container.sh up` 在启动前强制校验：`~/lfs-builder/mnt/lfs` 已挂载、来源是
+`/dev/loop*`、且该 loop 指向 `~/lfs-builder/images/` 下的镜像；任一不满足直接拒绝启动，
 避免误把宿主机真实磁盘挂进容器。`--privileged` 是为第 7 章起 chroot 内的 mount 准备的。
 
 ## 4. 手册 §4.2 / §4.3 / §4.4 的落地

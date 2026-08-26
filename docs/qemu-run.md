@@ -1,11 +1,11 @@
 # QEMU 启动与验收
 
-> 本文中的 `/root/lfs` 是示例路径；实际以当前 clone 的仓库根目录为准。
+> 本文中的 `~/lfs-builder` 是示例路径；实际以当前 clone 的仓库根目录为准。
 
 先确保镜像没有挂载，再从项目根目录启动：
 
 ```sh
-cd /root/lfs
+cd ~/lfs-builder
 make umount
 make qemu
 ```

@@ -1,6 +1,7 @@
 # LFS 13.0-systemd Chapter 9 and Section 10.2 checkpoint
 
-> `/root/lfs` below records the original build host; use the current clone's repository root in a new checkout.
+> `/root/lfs` below is the actual path used for this checkpoint on the original build host. It is intentionally
+> preserved to keep the historical record accurate; use the current clone's repository root in a new checkout.
 
 Completed on 2026-08-25 for the QEMU raw image rooted at `/root/lfs/mnt/lfs`.
 
