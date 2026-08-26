@@ -1,0 +1,10 @@
+images/
+mnt/
+backups/
+sources/
+logs/
+*.img
+*.tar.xz
+*.tar.zst
+*.log
+core
