@@ -389,18 +389,18 @@ echo "  /dev/ptmx      ：$(ls -ld /dev/ptmx | sed 's/  */ /g')"
 if [ -e /dev/pts/ptmx ]; then
   echo "  /dev/pts/ptmx  ：$(ls -l /dev/pts/ptmx | sed 's/  */ /g')"
 fi
-if su tester -c 'exec 3<> /dev/ptmx' 2>/dev/null; then
-  echo "  OK   tester 可以打开 /dev/ptmx（Expect 的 spawn 能工作）"
-else
-  echo "  FAIL tester 无法打开 /dev/ptmx —— 以 tester 身份跑的测试会全部假失败"
-  echo "       成因与修法见 scripts/chroot.sh 里的 ensure_ptmx_usable 函数注释"
-  rc=1
-fi
+# Shadow（提供 su）要到 §8.29 才安装，此时不能在 chroot 内用
+# `su tester` 做检查。实际的 UID/GID 切换打开测试由 chroot 外层完成。
 exit $rc
 INNER
   chroot_run_file "$tmp" || rc=$?
   rm -f "$tmp"
   [ $rc -eq 0 ] || die "§7.5/§7.6 在 chroot 内执行失败（退出码 $rc）"
+  if chroot --userspec=101:101 "$LFS" /bin/bash -c 'exec 3<> /dev/ptmx' 2>/dev/null; then
+    echo "  OK   tester(uid=101,gid=101) 可以打开 /dev/ptmx（Expect 的 spawn 能工作）"
+  else
+    die "tester(uid=101,gid=101) 无法打开 /dev/ptmx —— 以 tester 身份跑的测试会全部假失败"
+  fi
   echo
 }
 

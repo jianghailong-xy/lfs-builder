@@ -24,7 +24,7 @@ echo "开始时间：$(date -Is)"
 echo "手册简介：The Zlib package contains compression and decompression routines used"
 echo "  by some programs."
 echo "手册数据：Approximate build time less than 0.1 SBU，Required disk space 6.4 MB"
-echo "手册存档：/workspace/docs/book/chapter08-zlib.html（宿主机 $LFS_ROOT/docs/book/）"
+echo "手册存档：/workspace/docs/book/chapter08-zlib.html（宿主机 \$LFS_ROOT/docs/book/）"
 echo
 
 echo "----- 环境（手册 §7.4 进入 chroot 后的环境） -----"
@@ -295,8 +295,8 @@ echo
 
 echo "----- 保留测试摘要后清理构建目录（手册 iii：删除解包出来的源码目录） -----"
 echo "（摘要先写到 /sources —— 它是宿主机 bind mount，随后由宿主机侧 run-8.6.sh"
-echo "  移入 $LFS_ROOT/logs/packages/，不会在镜像内留下多余目录）"
-echo "  make check 完整输出已在 $CHECKLOG（= 宿主 $LFS_ROOT/sources/.zlib-make-check.log）"
+echo "  移入 \$LFS_ROOT/logs/packages/，不会在镜像内留下多余目录）"
+echo "  make check 完整输出已在 $CHECKLOG（= 宿主 \$LFS_ROOT/sources/.zlib-make-check.log）"
 cd /sources
 rm -rf "$SRCDIR"
 [ -d "/sources/$SRCDIR" ] && { echo "错误：源码目录未清理" >&2; exit 1; }

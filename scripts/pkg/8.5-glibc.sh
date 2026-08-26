@@ -51,7 +51,7 @@ echo "  basic routines for allocating memory, searching directories, opening and
 echo "  files, reading and writing files, string handling, pattern matching, arithmetic,"
 echo "  and so on."
 echo "手册数据：Approximate build time 12 SBU，Required disk space 3.5 GB"
-echo "手册存档：/workspace/docs/book/chapter08-glibc.html（宿主机 $LFS_ROOT/docs/book/）"
+echo "手册存档：/workspace/docs/book/chapter08-glibc.html（宿主机 \$LFS_ROOT/docs/book/）"
 echo
 
 echo "----- 环境（手册 §7.4 进入 chroot 后的环境） -----"
@@ -625,7 +625,7 @@ echo
 echo "----- 保留测试摘要后清理构建目录（手册 iii：删除解包出来的源码目录） -----"
 # 注意：本脚本运行在 chroot 内，chroot 根就是 $LFS，宿主项目目录 /workspace 在这里
 # 是【不存在】的；写 /workspace/... 只会在镜像根下凭空造出一个 /workspace 目录。
-# chroot 内唯一通向宿主的路径是 /sources（bind mount 到宿主 $LFS_ROOT/sources），
+# chroot 内唯一通向宿主的路径是 /sources（bind mount 到宿主 \$LFS_ROOT/sources），
 # 因此测试摘要先落到 /sources，再由宿主侧 run-8.5.sh 移入 logs/packages。
 if [ -f tests.sum ]; then
   cp -v tests.sum /sources/8.5-glibc-2.43.tests.sum

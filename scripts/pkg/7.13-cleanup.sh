@@ -53,15 +53,19 @@ echo "  子任务的产物在 \$LFS 中全部就位、彼此一致，然后才�
 echo
 
 echo "----- 第 5 章（交叉工具链，安装到 /usr 与 /tools） -----"
-echo "§5.2 Binutils-2.46.0 Pass 1 → \$LFS/tools（交叉 binutils）"
-for p in /tools/bin/x86_64-lfs-linux-gnu-ld /tools/bin/x86_64-lfs-linux-gnu-as \
-         /tools/bin/x86_64-lfs-linux-gnu-ar /tools/bin/x86_64-lfs-linux-gnu-ranlib; do
-  if [ -x "$p" ]; then printf '  OK   %s\n' "$p"; else printf '  FAIL %s 缺失\n' "$p"; rc=1; fi
-done
-echo "§5.3 GCC-15.2.0 Pass 1 → \$LFS/tools（交叉 gcc）"
-for p in /tools/bin/x86_64-lfs-linux-gnu-gcc /tools/bin/x86_64-lfs-linux-gnu-g++; do
-  if [ -x "$p" ]; then printf '  OK   %s\n' "$p"; else printf '  FAIL %s 缺失\n' "$p"; rc=1; fi
-done
+if [ -d /tools ]; then
+  echo "§5.2 Binutils-2.46.0 Pass 1 → \$LFS/tools（交叉 binutils）"
+  for p in /tools/bin/x86_64-lfs-linux-gnu-ld /tools/bin/x86_64-lfs-linux-gnu-as \
+           /tools/bin/x86_64-lfs-linux-gnu-ar /tools/bin/x86_64-lfs-linux-gnu-ranlib; do
+    if [ -x "$p" ]; then printf '  OK   %s\n' "$p"; else printf '  FAIL %s 缺失\n' "$p"; rc=1; fi
+  done
+  echo "§5.3 GCC-15.2.0 Pass 1 → \$LFS/tools（交叉 gcc）"
+  for p in /tools/bin/x86_64-lfs-linux-gnu-gcc /tools/bin/x86_64-lfs-linux-gnu-g++; do
+    if [ -x "$p" ]; then printf '  OK   %s\n' "$p"; else printf '  FAIL %s 缺失\n' "$p"; rc=1; fi
+  done
+else
+  echo "  INFO /tools 不存在：先前的 §7.13.1 Cleaning 已完成；交叉工具检查不再适用"
+fi
 echo "§5.4 Linux-6.18.10 API Headers → /usr/include"
 for h in /usr/include/linux/version.h /usr/include/asm/unistd.h /usr/include/asm-generic/int-ll64.h; do
   if [ -f "$h" ]; then printf '  OK   %s\n' "$h"; else printf '  FAIL %s 缺失\n' "$h"; rc=1; fi
@@ -262,7 +266,7 @@ la_before=$(find /usr/lib /usr/libexec -name '*.la' 2>/dev/null | wc -l)
 echo "  /usr/{lib,libexec} 下 .la 文件：$la_before 个"
 find /usr/lib /usr/libexec -name '*.la' 2>/dev/null | sed 's/^/    /'
 echo "  /tools 顶层："
-ls -la /tools 2>/dev/null | sed 's/^/    /'
+if [ -d /tools ]; then ls -la /tools | sed 's/^/    /'; else echo "    (不存在，已清理)"; fi
 echo
 
 [ $rc -eq 0 ] || { echo "错误：清理前的核对未全部通过，按任务要求不执行 §7.13 的删除操作" >&2; exit 1; }

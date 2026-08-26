@@ -6,10 +6,17 @@ echo '#define SYS_VIMRC_FILE "/etc/vimrc"' >> src/feature.h
 make
 chown -R tester .
 sed '/test_plugin_glvs/d' -i src/testdir/Make_all.mak
-set +e; su tester -c 'TERM=xterm-256color LANG=en_US.UTF-8 make -j1 test' </dev/null > vim-test.log 2>&1; rc=$?; set -e
+set +e; su tester -c 'TERM=xterm-256color LANG=en_US.UTF-8 make -j1 test' > vim-test.log 2>&1; rc=$?; set -e
 if [ "$rc" -ne 0 ]; then
-  grep -Eq 'Test_client_server_stopinsert|Test_popup_setbuf' vim-test.log || exit "$rc"
-  grep -E 'Test_[A-Za-z0-9_]+\(\)' vim-test.log | grep -Ev 'Test_client_server_stopinsert|Test_popup_setbuf' && exit "$rc"
+  # The summary also lists hundreds of skipped Test_* cases (missing GUI,
+  # Windows-only features, and so on).  Only "Found errors in" identifies an
+  # actual failed test, so validate that set against the two failures allowed
+  # by the LFS book.
+  grep -Eq 'Found errors in (Test_client_server_stopinsert|Test_popup_setbuf)\(\)' vim-test.log || exit "$rc"
+  if grep -E 'Found errors in Test_[A-Za-z0-9_]+\(\)' vim-test.log \
+       | grep -Ev 'Found errors in (Test_client_server_stopinsert|Test_popup_setbuf)\(\)'; then
+    exit "$rc"
+  fi
 fi
 make install
 ln -sv vim /usr/bin/vi

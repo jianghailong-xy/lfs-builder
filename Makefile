@@ -48,6 +48,7 @@ C_LFS         := /mnt/lfs
 C_SOURCES     := /mnt/lfs/sources
 DOCKER_IMAGE  ?= lfs-build-$(CLONE_NAME):13.0-systemd
 CONTAINER     ?= lfs-build-$(CLONE_NAME)
+DOCKER_NO_CACHE ?= 0
 
 SKEL_DIRS := $(SOURCES_DIR) $(SCRIPTS_DIR) $(DOCS_DIR) $(DOCKER_DIR) \
              $(IMAGES_DIR) $(LOGS_DIR) $(PKG_LOGS_DIR) $(HOST_LOGS_DIR) $(LFS_MNT)
@@ -55,12 +56,12 @@ SKEL_DIRS := $(SOURCES_DIR) $(SCRIPTS_DIR) $(DOCS_DIR) $(DOCKER_DIR) \
 export LFS_ROOT SOURCES_DIR SCRIPTS_DIR LOGS_DIR PKG_LOGS_DIR HOST_LOGS_DIR
 export LFS_MNT IMAGES_DIR IMAGE IMAGE_SIZE_GB MIN_FREE_GB IMAGE_LABEL IMAGE_UUID FORCE
 export DISK DISK_MNT ALLOW_LOOP_TEST
-export C_PROJECT C_LFS C_SOURCES DOCKER_IMAGE CONTAINER
+export C_PROJECT C_LFS C_SOURCES DOCKER_IMAGE CONTAINER DOCKER_NO_CACHE
 
 .PHONY: help dirs doctor status image mount umount disk-install disk-install-check grub qemu sources sources-verify \
         sources-status env container-build container-up container-prepare \
         container-check container-shell lfs-shell container-down container-status \
-        build-chapter5 build-chapter6 build-chapter7 build-chapter8 build-all
+        build-chapter5 build-chapter6 build-chapter7 build-chapter8 build-all finish-system
 
 help: ## 显示可用目标
 	@echo "LFS 13.0-systemd 构建 (LFS_ROOT=$(LFS_ROOT))"
@@ -94,8 +95,11 @@ disk-install-check: ## 只读检查物理盘安全闸，不确认、不写盘（
 	@test -n "$(DISK)" || { echo "[FAIL] 必须显式传入 DISK=/dev/sdX 或 /dev/nvmeXnY" >&2; exit 2; }
 	@$(DISK_TARGET_SCRIPT) check "$(DISK)"
 
-grub: ## 安全地把 BIOS GRUB 安装到项目镜像（需 mount、env、build-all）
+grub: finish-system ## 安全地把 BIOS GRUB 安装到项目镜像（自动完成 §§8.84–10.3）
 	@$(GRUB_SCRIPT)
+
+finish-system: ## 完成 §§8.84–8.86、Chapter 9/§10.2 和 §10.3 内核
+	@$(SCRIPTS_DIR)/finish-system.sh
 
 qemu: dirs ## 以 VirtIO 磁盘和串口控制台启动成品镜像
 	@$(SCRIPTS_DIR)/qemu-run.sh

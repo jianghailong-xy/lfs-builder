@@ -23,7 +23,7 @@ echo "----- 源码校验与解包 -----"
 md5sum Python-3.14.3.tar.xz python-3.14.3-docs-html.tar.bz2
 echo 'ef513dcb836d219ae0e2b16ac9c87d0f  Python-3.14.3.tar.xz' | md5sum -c -
 echo '005159be74cf46222d6399fbc0fb0ada  python-3.14.3-docs-html.tar.bz2' | md5sum -c -
-test ! -e /sources/Python-3.14.3
+rm -rf /sources/Python-3.14.3
 tar -xvf Python-3.14.3.tar.xz
 cd Python-3.14.3
 echo "源码目录：$PWD"
@@ -44,14 +44,15 @@ echo
 
 echo "----- 测试（手册命令） -----"
 set +e
-make test TESTOPTS="--timeout 120"
-test_rc=$?
+make test TESTOPTS="--timeout 120" 2>&1 | tee /tmp/python-8.53-test.log
+test_rc=${PIPESTATUS[0]}
 set -e
 if [ "$test_rc" -ne 0 ]; then
   echo "INFO make test 退出码：$test_rc；核对是否仅为手册允许的 DNS 失败。"
   test "$test_rc" -eq 2
-  test "$(grep -Ec '^    test_urllib2 test_urllibnet$' /workspace/logs/packages/8.53-python-3.14.3.log 2>/dev/null || true)" -ge 1
+  test "$(grep -Ec '^    test_urllib2 test_urllibnet$' /tmp/python-8.53-test.log || true)" -ge 1
 fi
+rm -f /tmp/python-8.53-test.log
 echo "OK   Python 测试达到手册允许结果。"
 echo
 

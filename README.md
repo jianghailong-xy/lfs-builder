@@ -41,12 +41,17 @@ make mount     # 前置：image；数秒，关联 loop 并挂载到 mnt/lfs
 make sources   # 前置：网络可用；约 5–20 分钟，下载并校验源码（缓存命中更快）
 make env       # 前置：mount；约 5–15 分钟，构建/启动容器并准备第 4 章环境
 make build-all # 前置：mount、sources、env；本机 -j8 实测约 19 小时，构建第 5–8 章 110 个小节
-make grub      # 前置：build-all 且镜像仍挂载、容器运行；约 1 分钟，仅写项目镜像
+make grub      # 前置：build-all 且镜像仍挂载、容器运行；先完成 §§8.84–10.3，再仅向项目镜像安装 GRUB
 make umount    # 前置：grub；数秒，先卸载虚拟文件系统/根分区，再解除 loop
 make qemu      # 前置：umount；约 1 分钟启动，串口应出现 lfs login:
 ```
 
-`make grub` 在 LFS chroot 内安装 BIOS GRUB，并由 `blkid` 读取根分区的实际
+验证完全无缓存的复现时，将上面的 `make env` 改为
+`make env DOCKER_NO_CACHE=1`；这会向 Docker build 传入 `--no-cache`。源码目录也必须
+从空目录开始，不能复用其他 clone 的 `sources/` 或快照。
+
+`make grub` 先运行仓库中原先未接入最短路径的 §§8.84–8.86 收尾、Chapter 9/§10.2
+系统配置和 §10.3 内核构建，然后在 LFS chroot 内安装 BIOS GRUB，并由 `blkid` 读取根分区的实际
 PARTUUID，生成 `root=PARTUUID=... ro console=ttyS0,115200n8`。它不生成
 initramfs，也不写 `initrd` 行，因此根盘不依赖 VirtIO 或“第一块盘”的设备名。
 

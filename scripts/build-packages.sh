@@ -31,9 +31,11 @@ section_log() {
 
 log_succeeded() {
     local log="$1"
-    # run 脚本统一在日志末尾记录“退出码：N”；允许历史日志的前缀有所不同。
-    awk '/退出码：[0-9]+$/ || /退出码: ?[0-9]+$/ || /^HOST_EXIT_CODE: [0-9]+$/ || /^FINAL_RESULT: / || /^##### 最终结论：/ || /^##### Complete:/ || /^===== §[0-9.]+ 全部完成/ { line=$0 }
-         END { exit !(line ~ /退出码：0$/ || line ~ /退出码: ?0$/ || line ~ /HOST_EXIT_CODE: 0$/ || line ~ /FINAL_RESULT: SUCCESS$/ || line ~ /最终结论：SUCCESS/ || line ~ /^##### Complete:/ || line ~ /全部完成/) }' "$log"
+    # run 脚本统一在日志末尾记录成功标记；只接受末尾窗口中的标记。
+    # 某些多阶段 runner（如 §7.13）会在中途记录子步骤“退出码：0”，
+    # 之后的备份步骤仍可能失败；扫描整份日志会把这种失败误判为可跳过。
+    tail -n 40 "$log" | awk '/退出码：[0-9]+$/ || /退出码: ?[0-9]+$/ || /^HOST_EXIT_CODE: [0-9]+$/ || /^FINAL_RESULT: / || /^##### 最终结论：/ || /^##### Complete:/ || /^===== §[0-9.]+ 全部完成/ { line=$0 }
+         END { exit !(line ~ /退出码：0$/ || line ~ /退出码: ?0$/ || line ~ /HOST_EXIT_CODE: 0$/ || line ~ /FINAL_RESULT: SUCCESS$/ || line ~ /最终结论：SUCCESS/ || line ~ /^##### Complete:/ || line ~ /全部完成/) }'
 }
 
 run_chapter() {

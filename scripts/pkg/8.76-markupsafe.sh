@@ -7,8 +7,13 @@ echo "start: $(date -Iseconds)"
 cd /sources
 
 echo "===== 前置产物与源码校验 ====="
-vim --version | head -n3
-test "$(vim --version | head -n1)" = "VIM - Vi IMproved 9.2 (2026 Feb 14, compiled Aug 25 2026 18:21:28)"
+vim_version=$(vim --version)
+printf '%s\n' "$vim_version" | sed -n '1,3p'
+case "$vim_version" in
+  'VIM - Vi IMproved 9.2 (2026 Feb 14, compiled '* ) ;;
+  *) echo "ERROR: unexpected Vim version line" >&2; exit 1 ;;
+esac
+printf '%s\n' "$vim_version" | grep '^Included patches: 1-78$' >/dev/null
 test -x /usr/bin/vim
 test -L /usr/bin/vi
 test -s /etc/vimrc

@@ -36,7 +36,7 @@ echo "手册简介：The Bzip2 package contains programs for compressing and dec
 echo "  files. Compressing text files with bzip2 yields a much better compression"
 echo "  percentage than with the traditional gzip."
 echo "手册数据：Approximate build time less than 0.1 SBU，Required disk space 7.3 MB"
-echo "手册存档：/workspace/docs/book/chapter08-bzip2.html（宿主机 $LFS_ROOT/docs/book/）"
+echo "手册存档：/workspace/docs/book/chapter08-bzip2.html（宿主机 \$LFS_ROOT/docs/book/）"
 echo
 
 echo "----- 环境（手册 §7.4 进入 chroot 后的环境） -----"
@@ -433,8 +433,8 @@ echo
 
 echo "----- 保留 make（含测试）完整输出后清理构建目录（手册 iii：删除解包出来的源码目录） -----"
 echo "（输出先写到 /sources —— 它是宿主机 bind mount，随后由宿主机侧 run-8.7.sh"
-echo "  移入 $LFS_ROOT/logs/packages/，不会在镜像内留下多余目录）"
-echo "  make 完整输出已在 $MAKELOG（= 宿主 $LFS_ROOT/sources/.bzip2-make.log）"
+echo "  移入 \$LFS_ROOT/logs/packages/，不会在镜像内留下多余目录）"
+echo "  make 完整输出已在 $MAKELOG（= 宿主 \$LFS_ROOT/sources/.bzip2-make.log）"
 cd /sources
 rm -rf "$SRCDIR"
 [ -d "/sources/$SRCDIR" ] && { echo "错误：源码目录未清理" >&2; exit 1; }

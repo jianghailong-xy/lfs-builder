@@ -115,7 +115,14 @@ echo "  卸载 \$LFS/sources（bind mount 由 docker run -v 建立，稍后随 c
 echo "  所依赖的容器一并保持；这里只在打包期间让它离开 \$LFS 视图）："
 TAR_EXCLUDE=()
 if mountpoint -q "$LFS/sources"; then
-  if umount -v "$LFS/sources"; then
+  # Docker 容器被重建或重启后，rshared 传播可能在同一目标留下多层
+  # bind mount。单次 umount 只移除最上层；只针对这个精确目标循环，
+  # 直到它不再是挂载点，以免 tar 穿过下层挂载读取宿主 sources。
+  unmount_ok=1
+  while mountpoint -q "$LFS/sources"; do
+    if ! umount -v "$LFS/sources"; then unmount_ok=0; break; fi
+  done
+  if [ "$unmount_ok" -eq 1 ]; then
     echo "  OK   已卸载，\$LFS/sources 现在是根分区上的一个空目录，"
     echo "       打包会把它作为空目录收进归档（还原后仍是可用的挂载点）。"
   else

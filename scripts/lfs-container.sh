@@ -43,7 +43,11 @@ require_container() {
     || die "容器 $CONTAINER 未运行，请先执行 make container-up"
 }
 
-cmd_build() { docker build -t "$DOCKER_IMAGE" "$DOCKER_DIR"; }
+cmd_build() {
+  local args=()
+  [ "${DOCKER_NO_CACHE:-0}" = 1 ] && args+=(--no-cache)
+  docker build "${args[@]}" -t "$DOCKER_IMAGE" "$DOCKER_DIR"
+}
 
 cmd_up() {
   require_mount
