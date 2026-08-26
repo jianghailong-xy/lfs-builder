@@ -1,0 +1,23 @@
+可移植性 make -n 验证
+验证提交：e4200ba
+临时 clone：/tmp/lfs-portable-check.1ZwYdE
+
+$ make -n doctor
+mkdir -p /tmp/lfs-portable-check.1ZwYdE/sources /tmp/lfs-portable-check.1ZwYdE/scripts /tmp/lfs-portable-check.1ZwYdE/docs /tmp/lfs-portable-check.1ZwYdE/docker /tmp/lfs-portable-check.1ZwYdE/images /tmp/lfs-portable-check.1ZwYdE/logs /tmp/lfs-portable-check.1ZwYdE/logs/packages /tmp/lfs-portable-check.1ZwYdE/logs/host /tmp/lfs-portable-check.1ZwYdE/mnt/lfs
+echo "目录骨架就绪：/tmp/lfs-portable-check.1ZwYdE"
+/tmp/lfs-portable-check.1ZwYdE/scripts/host-doctor.sh
+
+$ make -n image
+mkdir -p /tmp/lfs-portable-check.1ZwYdE/sources /tmp/lfs-portable-check.1ZwYdE/scripts /tmp/lfs-portable-check.1ZwYdE/docs /tmp/lfs-portable-check.1ZwYdE/docker /tmp/lfs-portable-check.1ZwYdE/images /tmp/lfs-portable-check.1ZwYdE/logs /tmp/lfs-portable-check.1ZwYdE/logs/packages /tmp/lfs-portable-check.1ZwYdE/logs/host /tmp/lfs-portable-check.1ZwYdE/mnt/lfs
+echo "目录骨架就绪：/tmp/lfs-portable-check.1ZwYdE"
+/tmp/lfs-portable-check.1ZwYdE/scripts/disk-image.sh create
+
+$ make -n mount
+mkdir -p /tmp/lfs-portable-check.1ZwYdE/sources /tmp/lfs-portable-check.1ZwYdE/scripts /tmp/lfs-portable-check.1ZwYdE/docs /tmp/lfs-portable-check.1ZwYdE/docker /tmp/lfs-portable-check.1ZwYdE/images /tmp/lfs-portable-check.1ZwYdE/logs /tmp/lfs-portable-check.1ZwYdE/logs/packages /tmp/lfs-portable-check.1ZwYdE/logs/host /tmp/lfs-portable-check.1ZwYdE/mnt/lfs
+echo "目录骨架就绪：/tmp/lfs-portable-check.1ZwYdE"
+/tmp/lfs-portable-check.1ZwYdE/scripts/disk-image.sh mount
+
+$ make -n build-all
+/tmp/lfs-portable-check.1ZwYdE/scripts/build-packages.sh 5 6 7 8
+
+检查结果：四条命令均成功；输出中的绝对路径全部位于临时 clone；硬编码路径计数为 0。
