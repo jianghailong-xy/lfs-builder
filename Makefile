@@ -31,6 +31,8 @@ IMAGE_UUID    ?=
 FORCE         ?= 0
 IMAGE_INFO    := $(IMAGE).info
 DISK_SCRIPT   := $(SCRIPTS_DIR)/disk-image.sh
+DISK_TARGET_SCRIPT := $(SCRIPTS_DIR)/disk-target.sh
+DISK_MNT      ?= $(LFS_MNT)
 
 # ---- 源码包（sources 任务使用） ------------------------------------------
 SOURCES_SCRIPT := $(SCRIPTS_DIR)/fetch-sources.sh
@@ -52,9 +54,10 @@ SKEL_DIRS := $(SOURCES_DIR) $(SCRIPTS_DIR) $(DOCS_DIR) $(DOCKER_DIR) \
 
 export LFS_ROOT SOURCES_DIR SCRIPTS_DIR LOGS_DIR PKG_LOGS_DIR HOST_LOGS_DIR
 export LFS_MNT IMAGES_DIR IMAGE IMAGE_SIZE_GB MIN_FREE_GB IMAGE_LABEL IMAGE_UUID FORCE
+export DISK DISK_MNT ALLOW_LOOP_TEST
 export C_PROJECT C_LFS C_SOURCES DOCKER_IMAGE CONTAINER
 
-.PHONY: help dirs doctor status image mount umount grub qemu sources sources-verify \
+.PHONY: help dirs doctor status image mount umount disk-install disk-install-check grub qemu sources sources-verify \
         sources-status env container-build container-up container-prepare \
         container-check container-shell lfs-shell container-down container-status \
         build-chapter5 build-chapter6 build-chapter7 build-chapter8 build-all
@@ -82,6 +85,14 @@ mount: dirs ## 关联 loop 并把根分区挂载到 mnt/lfs（幂等）
 
 umount: ## 卸载 mnt/lfs 并解除 loop 关联（先卸载后解关联）
 	@$(DISK_SCRIPT) umount
+
+disk-install: ## 清空整块物理盘并建立 LFS 分区（必须显式 DISK=/dev/...；破坏性）
+	@test -n "$(DISK)" || { echo "[FAIL] 必须显式传入 DISK=/dev/sdX 或 /dev/nvmeXnY" >&2; exit 2; }
+	@$(DISK_TARGET_SCRIPT) install "$(DISK)"
+
+disk-install-check: ## 只读检查物理盘安全闸，不确认、不写盘（必须显式 DISK=...）
+	@test -n "$(DISK)" || { echo "[FAIL] 必须显式传入 DISK=/dev/sdX 或 /dev/nvmeXnY" >&2; exit 2; }
+	@$(DISK_TARGET_SCRIPT) check "$(DISK)"
 
 grub: ## 安全地把 BIOS GRUB 安装到项目镜像（需 mount、env、build-all）
 	@$(GRUB_SCRIPT)

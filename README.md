@@ -17,6 +17,7 @@
 | [`docs/conventions.md`](docs/conventions.md) | **路径与容器挂载点约定**，全项目强制遵循 |
 | [`docs/host-environment.md`](docs/host-environment.md) | 宿主机体检结论：工具、磁盘空间、KVM 能力 |
 | [`docs/disk-image.md`](docs/disk-image.md) | raw 镜像布局、分区表、文件系统 UUID 与 loop/挂载操作 |
+| [`docs/physical-disk.md`](docs/physical-disk.md) | **破坏性**物理整盘安装、安全闸、人工确认与只读检查 |
 | [`docs/sources.md`](docs/sources.md) | 源码包清单来源、MD5 校验方式与缓存复用策略 |
 | [`docs/build-environment.md`](docs/build-environment.md) | 构建容器、手册 §2.2/§4.2/§4.3/§4.4 准备与 SBU 基准 |
 | [`docs/checkpoint-ch5-7.md`](docs/checkpoint-ch5-7.md) | **第 5–7 章阶段检查点**：28 个包的产物与版本、工具链一致性验证、§7.13 清理与临时系统备份/还原 |
@@ -55,6 +56,25 @@ initramfs，也不写 `initrd` 行，因此根盘不依赖 VirtIO 或“第一�
 
 `make doctor` 的强制项失败时返回非零退出码并给出 `apt-get install` 建议；
 KVM 属可选项，缺失只告警。
+
+## 构建到物理硬盘
+
+> **危险：`make disk-install` 会不可恢复地清空目标整盘。** 它不是复制文件命令，
+> 而是重建 GPT 分区表、格式化 ext4 并把新根分区挂到 `mnt/lfs`。
+
+必须用规范整盘路径显式指定目标，且先做只读检查：
+
+```sh
+make disk-install-check DISK=/dev/sdX   # 只读；安全闸命中时非零退出
+make disk-install DISK=/dev/sdX         # 通过安全闸后仍要求在终端输入“清空 /dev/sdX”
+```
+
+不传 `DISK`、传分区路径、从非交互环境调用都会拒绝。已挂载、活动 swap、
+ZFS/MD/LVM 成员、含 EFI 系统分区、承载当前 `/`、`/boot` 或 `/boot/efi` 的盘
+会在确认提示出现前硬性拒绝。操作前应备份数据、核对型号/序列号/容量和完整设备画像，
+并确保目标确实是可牺牲的空闲整盘。完整说明见
+[`docs/physical-disk.md`](docs/physical-disk.md)。镜像入口 `make image/mount/umount/status`
+仍使用原有独立安全逻辑。
 
 ## 从零复现
 
@@ -137,6 +157,6 @@ make qemu
 
 ## 安全边界
 
-只操作 `~/lfs-builder/images/` 下的镜像及其 loop 设备。执行任何
-`losetup` / `mount` / `umount` / `mkfs` / `grub-install` 前先用 `make status`
-确认精确目标，禁止触碰宿主机 `/dev/nvme*`、`/dev/sd*` 等真实磁盘与挂载点。
+默认镜像流程只操作 `~/lfs-builder/images/` 下的镜像及其 loop 设备。物理盘只能经
+`make disk-install DISK=...` 的独立安全闸和人工二次确认进入；任何绕过该入口的
+`sfdisk` / `mkfs` / `wipefs` / `dd` / `grub-install` 都不属于受支持流程。
