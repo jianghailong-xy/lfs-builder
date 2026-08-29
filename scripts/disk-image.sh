@@ -227,6 +227,18 @@ cmd_umount() {
     assert_image_path
     head_ "卸载并解除 loop 关联"
 
+    # 构建容器把镜像根挂进了自己的 mount namespace（/mnt/lfs 与 /workspace/mnt/lfs）。
+    # 宿主机侧 umount 只摘掉宿主视图，容器仍持有引用，losetup -d 会变成延迟解除，
+    # 于是随后的 make qemu 会因“镜像仍关联到 loop 设备”而正确拒绝启动。
+    # 因此先停掉容器释放 namespace，再做宿主机侧卸载。容器可用 make env 重新拉起。
+    if command -v docker >/dev/null 2>&1 && [ -n "${CONTAINER:-}" ] \
+       && docker ps --format '{{.Names}}' 2>/dev/null | grep -qx "$CONTAINER"; then
+        info "停止构建容器 $CONTAINER 以释放其 mount namespace 对镜像的持有"
+        docker stop "$CONTAINER" >/dev/null 2>&1 || true
+        docker rm   "$CONTAINER" >/dev/null 2>&1 || true
+        ok "容器 $CONTAINER 已停止并移除（如需继续构建，执行 make env 重新拉起）"
+    fi
+
     # 先卸载，再解除关联（docs/conventions.md §3，顺序不可颠倒）
     if findmnt -n "$LFS_MNT" >/dev/null 2>&1; then
         local cur; cur="$(findmnt -n -o SOURCE "$LFS_MNT" | head -1)"
